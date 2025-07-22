@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import personService from './services/persons'
 
 const Filter = ({ filter, onFilterChange }) => (
@@ -16,10 +15,19 @@ const PersonForm = ({ onSubmit, newName, newNumber, onNameChange, onNumberChange
   </form>
 )
 
-const Persons = ({ persons }) => {
+const Person = ({ person, toggleDelete }) => {
+  return (
+    <li>
+      {person.name} {person.number}
+      <button onClick={toggleDelete}>delete</button>
+    </li>
+  )
+}
+
+const Persons = ({ persons, toggleDelete }) => {
   return (
     <ul>
-      {persons.map(person => <li key={person.id}>{person.name} {person.number}</li>)}
+      {persons.map(person => <Person key={person.id} person={person} toggleDelete={() => toggleDelete(person.id)}/>)}
     </ul>
   )
 }
@@ -33,8 +41,8 @@ const App = () => {
   useEffect(() => {
     personService
       .getAll()
-      .then(response => {
-        setPersons(response.data)
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
   }, [])
 
@@ -50,6 +58,19 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
+  const toggleDeleteOf = (id) => {
+    const person = persons.find(person => person.id === id)
+    if (!person) return
+    const confirm = window.confirm(`Delete ${person.name}?`)
+    if (!confirm) return
+
+    personService
+      .del(id)
+      .then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
+  }
+
   const personsToshow = 
     filter === ('') 
       ? persons 
@@ -57,16 +78,28 @@ const App = () => {
 
   const addNewPerson = (event) => {
     event.preventDefault()
-    const newPerson = { name: newName, number: newNumber, id: persons.length + 1 }
-    const isDuplicateName = persons.some(person => person.name === newName)
+    // trap: don't say id: persons.length + 1 as it may cause issues when support delete
+    // just let server to generate ids.
+    const newPerson = { name: newName, number: newNumber}
+    // const isDuplicateName = persons.some(person => person.name === newName)
+    const duplicatedPerson = persons.find(person => person.name === newName)
     
-    if (isDuplicateName) {
-      alert(`${newName} is already added to phonebook`)
+    if (duplicatedPerson) {
+      // alert(`${newName} is already added to phonebook`)
+      const confirm = 
+        window.confirm(`${duplicatedPerson.name} is already added to phonebook, replace the old number with a new one?`)
+      if (confirm) {
+        personService
+          .update(duplicatedPerson.id, newPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id === duplicatedPerson.id ? returnedPerson : person))
+          })
+      }
     } else {
       personService
         .create(newPerson)
-        .then(response => {
-          setPersons(persons.concat(response.data))
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
         })
     }
 
@@ -87,7 +120,7 @@ const App = () => {
         onNumberChange={handleNumberChange}
       />
       <h3>Numbers</h3>
-      <Persons persons={personsToshow} />
+      <Persons persons={personsToshow} toggleDelete={toggleDeleteOf}/>
     </div>
   )
 }
