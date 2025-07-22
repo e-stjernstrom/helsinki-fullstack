@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
+import './index.css'
+
+const Notification = ( {message, isError}) => {
+  if (!message) return null
+
+  return (
+    <div className={`notification ${isError === true ? 'error' : 'success'}`}>
+      {message}
+    </div>
+  )
+}
 
 const Filter = ({ filter, onFilterChange }) => (
   <div>
@@ -37,6 +48,8 @@ const App = () => {
   const [filter, setFilter] = useState('')
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [notification, setNotification] = useState('')
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     personService
@@ -45,6 +58,15 @@ const App = () => {
         setPersons(initialPersons)
       })
   }, [])
+
+  const showNotification = (message, isError = false) => {
+    setNotification(message)
+    setIsError(isError)
+
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
@@ -67,6 +89,11 @@ const App = () => {
     personService
       .del(id)
       .then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+        showNotification(`Deleted ${person.name}`)
+      })
+      .catch(error => {
+        showNotification(`Information of ${person.name} has already been removed from server`, true)
         setPersons(persons.filter(person => person.id !== id))
       })
   }
@@ -93,6 +120,7 @@ const App = () => {
           .update(duplicatedPerson.id, newPerson)
           .then(returnedPerson => {
             setPersons(persons.map(person => person.id === duplicatedPerson.id ? returnedPerson : person))
+            showNotification(`Updated ${returnedPerson.name}`)
           })
       }
     } else {
@@ -100,6 +128,7 @@ const App = () => {
         .create(newPerson)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
+          showNotification(`Added ${returnedPerson.name}`)
         })
     }
 
@@ -109,6 +138,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification message={notification} isError={isError}/>
       <h2>Phonebook</h2>
       <Filter filter={filter} onFilterChange={handleFilterChange} />
       <h3>add a new</h3>
