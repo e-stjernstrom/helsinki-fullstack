@@ -5,15 +5,34 @@ const ShowCountry = ({ country }) => {
   return (
     <div>
       <h2>{country.name.common}</h2>
-      <p>Capital {country.capital.map(capital => (
-        <span key={capital}>{capital} </span>
-      ))}</p>
+      <p>
+        Capital {country.capital
+        ? country.capital.map(capital => (
+          <span key={capital}>{capital} </span>
+        ))
+        : 'N/A'}
+      </p>
       <p>Area {country.area}</p>
       <h3>Languages</h3>
-      <ul>{Object.values(country.languages).map(language => (
-        <li key={language}>{language}</li>
-      ))}</ul>
+      <ul>
+        {country.languages
+          ? Object.values(country.languages).map(language => (
+            <li key={language}>{language}</li>
+          ))
+          : <li>N/A</li>}
+      </ul>
       <img src={country.flags.png} alt={country.flags.alt} />
+    </div>
+  )
+}
+
+const CountryRow = ({ country }) => {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <div key={country.name.official}>
+      {country.name.common} <button onClick={() => setExpanded(!expanded)}>{expanded ? 'Hide' : 'Show'}</button>
+      {expanded && <ShowCountry country={country} />}
     </div>
   )
 }
@@ -32,7 +51,7 @@ const DisplayCountries = ({ countries, filter }) => {
   return (
     <div>
       {filtered.map(country => (
-        <div key={country.name.official}>{country.name.common}</div>
+        <CountryRow key={country.name.official} country={country}/>
       ))}
     </div>
   )
