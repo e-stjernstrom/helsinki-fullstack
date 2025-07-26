@@ -1,6 +1,39 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const CityWeather = ({ city }) => {
+  const api_key = import.meta.env.VITE_WEATHER_KEY
+  const [weather, setWeather] = useState(null)
+
+  const kelvinToCelsius = (kelvin) => ((kelvin - 273.15).toFixed(1))
+
+  useEffect(() => {
+    axios
+      .get(`http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${api_key}`)
+      .then(resGeo => {
+        const lat = resGeo.data[0].lat
+        const lon = resGeo.data[0].lon
+        return(axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}`))
+      })
+      .then(resWeather => {
+        setWeather(resWeather.data)
+      })
+  }, [city])
+
+  if (!weather) {
+    return null
+  }
+
+  return (
+    <div>
+      <h3>Weather in {weather.name}</h3>
+      <p>Temperature {kelvinToCelsius(weather.main.temp)} Celsius</p>
+      <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt={weather.weather[0].description} />
+      <p>Wind {weather.wind.speed} m/s</p>
+    </div>
+  )
+}
+
 const ShowCountry = ({ country }) => {
   return (
     <div>
@@ -22,6 +55,11 @@ const ShowCountry = ({ country }) => {
           : <li>N/A</li>}
       </ul>
       <img src={country.flags.png} alt={country.flags.alt} />
+      {country.capital
+        ? country.capital.map(capital => (
+          <CityWeather key={capital} city={capital} />
+        ))
+        : <CityWeather city={country.name.common} />}
     </div>
   )
 }
@@ -76,7 +114,7 @@ function App() {
 
   return (
     <div>
-      <p>find countiees <input value={filter} onChange={handleFilterChange} /></p>
+      <p>find countries <input value={filter} onChange={handleFilterChange} /></p>
       <DisplayCountries countries={countries} filter={filter}/>
     </div>
   )
