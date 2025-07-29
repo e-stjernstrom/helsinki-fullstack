@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import personService from './services/persons'
 import './index.css'
 
-const Notification = ( {message, isError}) => {
+const Notification = ({message, isError}) => {
   if (!message) return null
 
   return (
@@ -36,9 +36,18 @@ const Person = ({ person, toggleDelete }) => {
 }
 
 const Persons = ({ persons, toggleDelete }) => {
+  if (!persons) {
+    return ''
+  }
   return (
     <ul>
-      {persons.map(person => <Person key={person.id} person={person} toggleDelete={() => toggleDelete(person.id)}/>)}
+      {persons.map(person => (
+        <Person
+          key={person.id}
+          person={person}
+          toggleDelete={() => toggleDelete(person.id)}
+        />
+      ))}
     </ul>
   )
 }
