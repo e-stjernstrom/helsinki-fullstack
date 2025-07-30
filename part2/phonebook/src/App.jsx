@@ -118,7 +118,7 @@ const App = () => {
     // just let server to generate ids.
     const newPerson = { name: newName, number: newNumber}
     // const isDuplicateName = persons.some(person => person.name === newName)
-    const duplicatedPerson = persons.find(person => person.name === newName)
+    const duplicatedPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
     
     if (duplicatedPerson) {
       alert(`${newName} is already added to phonebook`)
