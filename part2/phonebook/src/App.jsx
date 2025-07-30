@@ -122,8 +122,7 @@ const App = () => {
     
     if (duplicatedPerson) {
       alert(`${newName} is already added to phonebook`)
-
-      /*
+      return // prevent because in Exercise 3.11. not required update logic
       const confirm = 
         window.confirm(`${duplicatedPerson.name} is already added to phonebook, replace the old number with a new one?`)
       if (confirm) {
@@ -134,15 +133,13 @@ const App = () => {
             showNotification(`Updated ${returnedPerson.name}`)
           })
       }
-      } else {
-        personService
-          .create(newPerson)
-          .then(returnedPerson => {
-            setPersons(persons.concat(returnedPerson))
-            showNotification(`Added ${returnedPerson.name}`)
-          })
-      }
-      */
+    } else {
+      personService
+        .create(newPerson)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          showNotification(`Added ${returnedPerson.name}`)
+        })
     }
 
     setNewName('')
