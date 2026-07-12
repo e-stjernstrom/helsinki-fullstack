@@ -13,16 +13,20 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :t
 const Person = require('./models/person')
 
 app.get('/info', (request, response) => {
-  response.send(`
-    <div>Phonebook has info for ${persons.length} people</div>
-    <div>${new Date()}</div>
-  `)
+  Person.find({})
+    .then(persons => {
+      response.send(`
+        <div>Phonebook has info for ${persons.length} people</div>
+        <div>${new Date()}</div>
+      `)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons', (request, response, next) => {
   Person.find({})
-    .then(notes => {
-      response.json(notes)
+    .then(persons => {
+      response.json(persons)
     })
     .catch(error => next(error))
 })
@@ -65,6 +69,32 @@ app.post('/api/persons', (request, response, next) => {
   person.save()
     .then(savedPerson => {
       response.json(savedPerson) // response output
+    })
+    .catch(error => next(error))
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id
+  const { name, number } = request.body
+
+  if (!name || !number) {
+    return response.status(400).json(
+      { error: 'name or number missing' }
+    )
+  }
+
+  Person.findById(request.params.id)
+    .then(person => {
+      if (!person) {
+        response.status(404).end()
+      } else {
+        person.name = name
+        person.number = number
+        person.save()
+          .then(updatedPerson => {
+            response.json(updatedPerson) // response output
+          })
+      }
     })
     .catch(error => next(error))
 })
