@@ -121,8 +121,7 @@ const App = () => {
     const duplicatedPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
     
     if (duplicatedPerson) {
-      alert(`${newName} is already added to phonebook`)
-      return // prevent because in Exercise 3.11. not required update logic
+      // alert(`${newName} is already added to phonebook`)
       const confirm = 
         window.confirm(`${duplicatedPerson.name} is already added to phonebook, replace the old number with a new one?`)
       if (confirm) {
@@ -132,13 +131,19 @@ const App = () => {
             setPersons(persons.map(person => person.id === duplicatedPerson.id ? returnedPerson : person))
             showNotification(`Updated ${returnedPerson.name}`)
           })
+          .catch(error => {
+            showNotification(error.response.data.error, true)
+          })
       }
     } else {
       personService
         .create(newPerson)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
-          showNotification(`Added ${returnedPerson.name}`)
+        .then(createdPerson => {
+          setPersons(persons.concat(createdPerson))
+          showNotification(`Added ${createdPerson.name}`)
+        })
+        .catch(error => {
+          showNotification(error.response.data.error, true)
         })
     }
 

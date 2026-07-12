@@ -15,6 +15,25 @@ content-type: application/json
 // Malformatted id
 GET http://localhost:3001/api/persons/1
 
+###
+DELETE http://localhost:3001/api/persons/6a5369ecd1e036e8f520e228
+
 ### 
-// Delete a record
-DELETE http://localhost:3001/api/persons/6a534811e22057e7db3546c5
+// Name shorter than 3 chars & wrong phone number format
+POST http://localhost:3001/api/persons/ HTTP/1.1
+content-type: application/json
+
+{
+    "name": "ET",
+    "number": "1982-05-26"
+}
+
+### 
+// Name shorter than 3 chars & wrong phone number format
+PUT http://localhost:3001/api/persons/6967800b3cd8957d83db0ea8 HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Tadokoro Kouji",
+    "number": "114-514-1919810"
+}
