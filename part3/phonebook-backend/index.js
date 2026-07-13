@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 
-morgan.token('type', (request, response) => (JSON.stringify(request.body)))
+morgan.token('type', (request) => (JSON.stringify(request.body)))
 
 const app = express()
 
@@ -12,7 +12,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :t
 
 const Person = require('./models/person')
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
   Person.find({})
     .then(persons => {
       response.send(`
@@ -45,8 +45,8 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
-  Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+  Person.findByIdAndDelete(id)
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -71,13 +71,7 @@ app.put('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   const { name, number } = request.body
 
-  // if (!name || !number) {
-  //  return response.status(400).json(
-  //    { error: 'name or number missing' }
-  //  )
-  // }
-
-  Person.findById(request.params.id)
+  Person.findById(id)
     .then(person => {
       if (!person) {
         response.status(404).end()
