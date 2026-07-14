@@ -1,0 +1,12 @@
+GET http://localhost:3003/api/blogs/
+
+###
+POST http://localhost:3003/api/blogs/
+content-type: application/json
+
+{
+  "title": "Manatsu no Yo no Inmu",
+  "author": "Coat Corporation",
+  "url": "https://www.coat.co.jp/",
+  "likes": 114514
+}
