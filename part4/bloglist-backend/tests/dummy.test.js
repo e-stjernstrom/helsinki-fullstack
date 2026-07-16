@@ -91,12 +91,12 @@ describe('total likes', () => {
 })
 
 describe('favorite blog', () => {
-  test('when list has no blog, returns an empty list', () => {
+  test('when list has no blog, returns a dummy record', () => {
     const result = listHelper.favoriteBlog(listWithoutBlog)
     assert.deepStrictEqual(result, [])
   })
 
-  test('when list has only one blog, returns that blog', () => {
+  test('when list has only one blog, returns the record with that author', () => {
     const result = listHelper.favoriteBlog(listWithOneBlog)
     assert.deepStrictEqual(result, listWithOneBlog[0])
   })
@@ -114,5 +114,78 @@ describe('favorite blog', () => {
     }
 
     assert.deepStrictEqual(result, expected)
+  })
+})
+
+describe('author with most blogs', () => {
+  test('when list has no blog, returns an empty list', () => {
+    const result = listHelper.mostBlogs(listWithoutBlog)
+    assert.deepStrictEqual(
+      result, 
+      {
+        author: undefined,
+        blogs: NaN
+      }
+    )
+  })
+
+  test('when list has only one blog, returns that author who has only one blog', () => {
+    const result = listHelper.mostBlogs(listWithOneBlog)
+    assert.deepStrictEqual(
+      result, 
+      {
+        author: 'Edsger W. Dijkstra',
+        blogs: 1
+      }
+    )
+  })
+
+  test('when list has many blogs without tie, returns the author who has the largest amount of blogs', () => {
+    const result = listHelper.mostBlogs(blogs)
+
+    assert.deepStrictEqual(
+      result, 
+      {
+        author: "Robert C. Martin",
+        blogs: 3
+      }
+    )
+  })
+})
+
+
+describe('author with most likes', () => {
+  test('when list has no blog, returns an empty list', () => {
+    const result = listHelper.mostLikes(listWithoutBlog)
+    assert.deepStrictEqual(
+      result, 
+      {
+        author: undefined,
+        likes: NaN
+      }
+    )
+  })
+
+  test('when list has only one blog, returns likes of that author', () => {
+    const result = listHelper.mostLikes(listWithOneBlog)
+    assert.deepStrictEqual(
+      result, 
+      {
+        author: 'Edsger W. Dijkstra',
+        likes: 5
+      }
+    )
+  })
+
+  test('when list has many blogs without tie, returns the author who has the largest amount of likes', () => {
+    const result = listHelper.mostLikes(blogs)
+
+    assert.deepStrictEqual(
+      result, 
+      {
+        author: "Edsger W. Dijkstra",
+        likes: 17
+      }
+    )
   })
 })
