@@ -2,28 +2,20 @@ const { test,describe } = require('node:test')
 const assert = require('node:assert')
 const listHelper = require('../utils/list_helper')
 
-test('dummy returns one', () => {
-  const blogs = []
-  
-  const result = listHelper.dummy(blogs)
-  assert.strictEqual(result, 1)
-})
+const listWithoutBlog = []
 
-describe('total likes', () => {
-  const listWithoutBlog = []
+const listWithOneBlog = [
+  {
+    _id: '5a422aa71b54a676234d17f8',
+    title: 'Go To Statement Considered Harmful',
+    author: 'Edsger W. Dijkstra',
+    url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 5,
+    __v: 0
+  }
+]
 
-  const listWithOneBlog = [
-    {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-      likes: 5,
-      __v: 0
-    }
-  ]
-
-  const blogs = [
+const blogs = [
     {
       _id: "5a422a851b54a676234d17f7",
       title: "React patterns",
@@ -74,6 +66,14 @@ describe('total likes', () => {
     }  
   ]
 
+test('dummy returns one', () => {
+  const blogs = []
+  
+  const result = listHelper.dummy(blogs)
+  assert.strictEqual(result, 1)
+})
+
+describe('total likes', () => {
   test('when list has no blog, equals zero', () => {
     const result = listHelper.totalLikes(listWithoutBlog)
     assert.strictEqual(result, 0)
@@ -87,5 +87,32 @@ describe('total likes', () => {
   test('when list has many blogs, returns the total sum of likes in all of the blog posts', () => {
     const result = listHelper.totalLikes(blogs)
     assert.strictEqual(result, 36)
+  })
+})
+
+describe('favorite blog', () => {
+  test('when list has no blog, returns an empty list', () => {
+    const result = listHelper.favoriteBlog(listWithoutBlog)
+    assert.deepStrictEqual(result, [])
+  })
+
+  test('when list has only one blog, returns that blog', () => {
+    const result = listHelper.favoriteBlog(listWithOneBlog)
+    assert.deepStrictEqual(result, listWithOneBlog[0])
+  })
+
+  test('when list has many blogs without tie, returns the blog with the most likes', () => {
+    const result = listHelper.favoriteBlog(blogs)
+
+    const expected = {
+      _id: "5a422b3a1b54a676234d17f9",
+      title: "Canonical string reduction",
+      author: "Edsger W. Dijkstra",
+      url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+      likes: 12,
+      __v: 0
+    }
+
+    assert.deepStrictEqual(result, expected)
   })
 })
