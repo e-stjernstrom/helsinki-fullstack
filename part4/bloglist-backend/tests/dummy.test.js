@@ -91,7 +91,7 @@ describe('total likes', () => {
 })
 
 describe('favorite blog', () => {
-  test('when list has no blog, returns a dummy record', () => {
+  test('when list has no blog, returns an empty list', () => {
     const result = listHelper.favoriteBlog(listWithoutBlog)
     assert.deepStrictEqual(result, [])
   })
@@ -118,7 +118,7 @@ describe('favorite blog', () => {
 })
 
 describe('author with most blogs', () => {
-  test('when list has no blog, returns an empty list', () => {
+  test('when list has no blog, returns a dummy record', () => {
     const result = listHelper.mostBlogs(listWithoutBlog)
     assert.deepStrictEqual(
       result, 
@@ -155,7 +155,7 @@ describe('author with most blogs', () => {
 
 
 describe('author with most likes', () => {
-  test('when list has no blog, returns an empty list', () => {
+  test('when list has no blog, returns a dummy record', () => {
     const result = listHelper.mostLikes(listWithoutBlog)
     assert.deepStrictEqual(
       result, 
