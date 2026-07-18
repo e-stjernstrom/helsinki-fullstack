@@ -39,10 +39,10 @@ describe('when there is initially some blogs saved', () => {
 
   test('POST request should be able to create a new blog', async () => {
     const newBlog = {
-      "title": "Building Node.js Natively on RISC-V",
-      "author": "Bruno Verachten",
-      "url": "https://bruno.verachten.fr/2025/11/07/building-node.js-natively-on-risc-v-a-15-hour-journey-from-fork-to-release/",
-      "likes": 1
+      title: "Building Node.js Natively on RISC-V: A 15-Hour Journey from Fork to Release",
+      author: "Bruno Verachten",
+      url: "https://bruno.verachten.fr/2025/11/07/building-node.js-natively-on-risc-v-a-15-hour-journey-from-fork-to-release/",
+      likes: 1
     }
     
     await api
@@ -61,9 +61,9 @@ describe('when there is initially some blogs saved', () => {
   test('if there is a POST without likes attribute, the default value should be 0', 
     async () => {
       const newBlog = {
-        "title": "Building Node.js Natively on RISC-V",
-        "author": "Bruno Verachten",
-        "url": "https://bruno.verachten.fr/2025/11/07/building-node.js-natively-on-risc-v-a-15-hour-journey-from-fork-to-release/"
+        title: "Building Node.js Natively on RISC-V: A 15-Hour Journey from Fork to Release",
+        author: "Bruno Verachten",
+        url: "https://bruno.verachten.fr/2025/11/07/building-node.js-natively-on-risc-v-a-15-hour-journey-from-fork-to-release/"
       }
 
       await api
@@ -79,8 +79,8 @@ describe('when there is initially some blogs saved', () => {
 
   test('POST a blog without the title attribute will get a 400 response', async () => {
     const newBlog = {
-      "author": "Bruno Verachten",
-      "url": "https://bruno.verachten.fr/2025/11/07/building-node.js-natively-on-risc-v-a-15-hour-journey-from-fork-to-release/"
+      author: "Bruno Verachten",
+      url: "https://bruno.verachten.fr/2025/11/07/building-node.js-natively-on-risc-v-a-15-hour-journey-from-fork-to-release/"
     }
 
     await api
@@ -90,15 +90,53 @@ describe('when there is initially some blogs saved', () => {
   })
 
   test('POST a blog without the url attribute will get a 400 response', async () => {
-  const newBlog = {
-    "title": "Building Node.js Natively on RISC-V",
-    "author": "Bruno Verachten"
-  }
+    const newBlog = {
+      title: "Building Node.js Natively on RISC-V: A 15-Hour Journey from Fork to Release",
+      author: "Bruno Verachten"
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
+
+  test('DELETE a blog correspoding its id should remove the resource with response 204', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+    assert(blogToDelete)
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    const ids = blogsAtEnd.map(n => n.id)
+    assert(!ids.includes(blogToDelete.id))
+
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
+  })
+
+  test('PUT a blog corresponding a specific id should only update its likes attribute', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+    
+    const newLikes = {
+      likes: blogToUpdate.likes + 1,
+      dummy: 'test',
+      dummy2: 1
+    }
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(newLikes)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const blogUpdated = blogsAtEnd[0]
+
+
+    assert.deepStrictEqual(blogUpdated, {...blogToUpdate, likes: blogToUpdate.likes + 1})
   })
 
 
