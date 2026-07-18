@@ -58,6 +58,48 @@ describe('when there is initially some blogs saved', () => {
     assert(titles.includes(newBlog.title))
   })
 
+  test('if there is a POST without likes attribute, the default value should be 0', 
+    async () => {
+      const newBlog = {
+        "title": "Building Node.js Natively on RISC-V",
+        "author": "Bruno Verachten",
+        "url": "https://bruno.verachten.fr/2025/11/07/building-node.js-natively-on-risc-v-a-15-hour-journey-from-fork-to-release/"
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+      
+      const blogsAtEnd = await helper.blogsInDb()
+      const addedBlog = blogsAtEnd.find(blog => blog.title === newBlog.title)
+
+      assert(addedBlog['likes'] === 0)
+    }
+  )
+
+  test('POST a blog without the title attribute will get a 400 response', async () => {
+    const newBlog = {
+      "author": "Bruno Verachten",
+      "url": "https://bruno.verachten.fr/2025/11/07/building-node.js-natively-on-risc-v-a-15-hour-journey-from-fork-to-release/"
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
+
+  test('POST a blog without the url attribute will get a 400 response', async () => {
+  const newBlog = {
+    "title": "Building Node.js Natively on RISC-V",
+    "author": "Bruno Verachten"
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+  })
 
 
 })
